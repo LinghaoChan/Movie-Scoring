@@ -11,13 +11,37 @@ class Get_Data():
 
     def get_movie_message(self, path = './movies.dat'):
         """
-        读取Movie数据集
+        Read Movie DataSets
         """
+        # read file
         new_movies = pd.DataFrame(columns=['MovieID', 'Title', 'Genres', 'Year'])
         movies_title = ['MovieID', 'Title_Year', 'Genres']
         movies = pd.read_csv(path, sep='::', header=None, names=movies_title, engine = 'python')
-        movies_orig = movies.values
+
+        # map Genres into number 0, 1, 2...
+        movie_genres_map = {
+            "Action" : 0,
+            "Adventure" : 1,
+            "Animation" : 2,
+            "Children's" : 3,
+            "Comedy" : 4,
+            "Crime" : 5,
+            "Documentary" : 6,
+            "Drama" : 7,
+            "Fantasy" : 8,
+            "Film-Noir" : 9,
+            "Horror" : 10,
+            "Musical" : 11,
+            "Mystery" : 12,
+            "Romance" : 13,
+            "Sci-Fi" : 14,
+            "Thriller" : 15,
+            "War" : 16,
+            "Western" : 17
+        }
+
         pattern = re.compile(r'\((\d+)\)$')
+        # seperate title and year
         for index, row in movies.iterrows():
             Title = re.sub(pattern, "", row['Title_Year'])
             Year = row['Title_Year'].replace(Title, '')
@@ -35,31 +59,43 @@ class Get_Data():
             ) 
             new_movies=new_movies.append(new,ignore_index=True)
         movie_list = new_movies.to_dict('records')
+        # make Genres into list-vector
         for movie in movie_list:
             Genres = movie['Genres']
-            Genres_list = Genres.split('|')
-            movie['Genres'] = Genres_list
-        print(movie_list)
+            Genres_list_str = Genres.split('|')
+            Genres_list_int = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            for Genres_str in Genres_list_str:
+                Genres_list_int[movie_genres_map[Genres_str]] = 1
+            movie['Genres'] = Genres_list_int
+        # print(movie_list)
         self.movies_data = movie_list
         return new_movies
 
     def get_user_message(self, path = './users.dat'):
         """
-        docstring
+        Read User Datasets
         """
+        # read file
         user_title = ['UserID', 'Gender', 'Age', 'Occupation', 'Zip-code']
         users = pd.read_csv(path, sep='::', header=None, names=user_title, engine = 'python')
+        # map Sex to 0, 1
+        gender_map = {'F':0, 'M':1}
+        users['Gender'] = users['Gender'].map(gender_map)
+        # map Age to number 0, 1, 2...
+        age_map = {val:ii for ii,val in enumerate(set(users['Age']))}
+        users['Age'] = users['Age'].map(age_map)
+        # delete Zip-code
         users = users.drop('Zip-code', axis = 1)
         users_list = users.to_dict('records')
+            
         self.users_data = users_list
         return users_list
 
-            
-        
 
-movie = Get_Data()
-# movie.get_movie_message()
-movie.get_user_message()
-print(movie.users_data)
-# if __name__ == "__main__":
-    
+
+if __name__ == "__main__":
+    movie = Get_Data()
+    # movie.get_movie_message()
+    # print(movie.movies_data)
+    # movie.get_user_message()
+    # print(movie.users_data)
