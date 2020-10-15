@@ -12,9 +12,11 @@ class Get_Data():
     
 
     def get_movie_message(self, path = './movies.dat'):
+
         """
         Read Movie DataSets
         """
+
         ''' read file'''
         new_movies = pd.DataFrame(columns=['MovieID', 'Title', 'Genres', 'Year'])
         movies_title = ['MovieID', 'Title_Year', 'Genres']
@@ -42,8 +44,8 @@ class Get_Data():
             "Western" : 17
         }
 
-        pattern = re.compile(r'\((\d+)\)$')
         ''' seperate title and year'''
+        pattern = re.compile(r'\((\d+)\)$')
         Title_list = []
         for index, row in movies.iterrows():
             Title = re.sub(pattern, "", row['Title_Year'])
@@ -73,6 +75,8 @@ class Get_Data():
         # print(title_embedded.shape)
         # s2v.plotarr(title_embedded)
         # make Genres into list-vector
+
+        ''' loading title_array.npy into array'''
         title_array = np.load("title_array.npy")
         i = 0
         for movie in movie_list:
@@ -86,7 +90,7 @@ class Get_Data():
             i += 1
         # print(movie_list)
         self.movies_data = movie_list
-        return new_movies
+        return new_movies   #return list(dictionary)
 
     def get_user_message(self, path = './users.dat'):
         """
@@ -106,7 +110,7 @@ class Get_Data():
         users_list = users.to_dict('records')
             
         self.users_data = users_list
-        return users_list
+        return users_list   #return list(dictionary)
 
 
 
