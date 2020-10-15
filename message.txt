@@ -1,0 +1,8 @@
+https://github.com/chengstone/movie_recommender
+
+https://blog.csdn.net/jackmcgradylee/article/details/79129105
+
+
+https://blog.csdn.net/ChuQiDeCha/article/details/84729177?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.edu_weight&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-4.edu_weight
+
+https://github.com/chuqidecha/movie_recommender
