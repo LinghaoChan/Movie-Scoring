@@ -150,23 +150,42 @@ class Get_Data():
         return rating_list
 
     def merge_movies_users_ratings_data(self):
+        """
+        Merge movies, users, ratings data
+        """
+
+        '''
+        get list(dictionary) data
+        '''
         pre_movies_data = self.get_movie_message()
         pre_users_data = self.get_user_message()
         pre_ratings_data = self.get_rating_message()
 
+        '''
+        list(dictionary) -> dataframe
+        '''
+
         movies_data_to_df = pd.DataFrame.from_records(pre_movies_data)
         users_data_to_df = pd.DataFrame.from_records(pre_users_data)
 
+        '''
+        Merge all infomation
+        '''
         rating_all_message_list = []
         print("Merging Movies Users Ratings Data")
         index = 0
         for rating in pre_ratings_data:
+            '''
+            link message
+            '''
             UID = rating['UserID']
             MID = rating['MovieID']
             RATING = rating['ratings']
             TIMESTAMPS = rating['timestamps']
 
-
+            '''
+            user message
+            '''
             user_row = users_data_to_df[users_data_to_df['UserID'].isin([UID])]
             user_row_list = user_row.to_dict('records')
             user_row_list_item = user_row_list[0]
@@ -174,7 +193,9 @@ class Get_Data():
             AGE = user_row_list_item['Age']
             OCCUPTION = user_row_list_item['Occupation']
 
-
+            '''
+            movie message
+            '''
             movie_row = movies_data_to_df[movies_data_to_df['MovieID'].isin([MID])]
             movie_row_list = movie_row.to_dict('records')
             movie_row_list_item = movie_row_list[0]
@@ -182,6 +203,9 @@ class Get_Data():
             GENRES = movie_row_list_item['Genres']
             YEAR = movie_row_list_item['Year']
             
+            '''
+            get a list(dictionary)
+            '''
             rating_dictionary = {
                 'UserID' : UID, 
                 'Gender' : GENDER, 
@@ -200,7 +224,9 @@ class Get_Data():
 
             rating_all_message_list.append(rating_dictionary)
             # print(rating_dictionary)
-        
+        '''
+        list(dictionary) -> dataframe and save "merge_movies_users_ratings_data.json"
+        '''        
         rating_all_message_df = pd.DataFrame.from_records(rating_all_message_list)
         rating_all_message_df.to_json("merge_movies_users_ratings_data.json")
         print("Having Merged Movies Users Ratings Data")
