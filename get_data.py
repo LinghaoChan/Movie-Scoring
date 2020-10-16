@@ -89,6 +89,7 @@ class Get_Data():
             movie['Title'] = title_array[i, :]
             i += 1
         # print(movie_list)
+
         self.movies_data = movie_list
         return new_movies   #return list(dictionary)
 
@@ -96,15 +97,19 @@ class Get_Data():
         """
         Read User Datasets
         """
+
         ''' read file'''
         user_title = ['UserID', 'Gender', 'Age', 'Occupation', 'Zip-code']
         users = pd.read_csv(path, sep='::', header=None, names=user_title, engine = 'python')
+
         ''' map Sex to 0, 1'''
         gender_map = {'F':0, 'M':1}
         users['Gender'] = users['Gender'].map(gender_map)
+
         ''' map Age to number 0, 1, 2...'''
         age_map = {val:ii for ii,val in enumerate(set(users['Age']))}
         users['Age'] = users['Age'].map(age_map)
+
         ''' delete Zip-code'''
         users = users.drop('Zip-code', axis = 1)
         users_list = users.to_dict('records')
@@ -112,11 +117,37 @@ class Get_Data():
         self.users_data = users_list
         return users_list   #return list(dictionary)
 
+    def get_rating_message(self, path = './ratings.dat'):
+        """
+        Read Rating Datasets
+        """
+
+        ''' read file'''
+        rating_title = ['UserID','MovieID', 'ratings', 'timestamps']
+        rating_data_df = pd.read_csv(path, sep='::', header=None, names=rating_title, engine = 'python')
+
+        ''' convert dataframe into list(dictionary)'''
+        rating_list = rating_data_df.to_dict('records')
+
+        ''' data normalization'''
+        MIN_TIMESTAMPS = 1046454590
+        MAX_TIMESTAMPS = 956703932
+        TIMESTAMPS_SIZE = 89750658
+        for rating in rating_list:
+            time_normlized = (rating['timestamps'] - MAX_TIMESTAMPS) / TIMESTAMPS_SIZE
+            rating['timestamps'] = time_normlized
+        # print(rating_list)
+        self.rating_data = rating_list
+        return rating_list
+
+    
 
 
 if __name__ == "__main__":
-    movie = Get_Data()
-    movie.get_movie_message()
-    print(movie.movies_data)
-    movie.get_user_message()
-    print(movie.users_data)
+    data = Get_Data()
+    data.get_movie_message()
+    print(data.movies_data)
+    data.get_user_message()
+    print(data.users_data)
+    data.get_rating_message()
+    print(data.rating_data)
