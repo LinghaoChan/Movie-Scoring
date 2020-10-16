@@ -17,6 +17,8 @@ class Get_Data():
         Read Movie DataSets
         """
 
+        print("Reading Movie File......")
+        
         ''' read file'''
         new_movies = pd.DataFrame(columns=['MovieID', 'Title', 'Genres', 'Year'])
         movies_title = ['MovieID', 'Title_Year', 'Genres']
@@ -91,13 +93,16 @@ class Get_Data():
         # print(movie_list)
 
         self.movies_data = movie_list
-        return new_movies   #return list(dictionary)
+        print("Having Read Movie File.")
+        return movie_list   #return list(dictionary)
 
     def get_user_message(self, path = './users.dat'):
         """
         Read User Datasets
         """
 
+        print("Reading User File......")
+       
         ''' read file'''
         user_title = ['UserID', 'Gender', 'Age', 'Occupation', 'Zip-code']
         users = pd.read_csv(path, sep='::', header=None, names=user_title, engine = 'python')
@@ -115,6 +120,7 @@ class Get_Data():
         users_list = users.to_dict('records')
             
         self.users_data = users_list
+        print("Having Read User File.")
         return users_list   #return list(dictionary)
 
     def get_rating_message(self, path = './ratings.dat'):
@@ -122,6 +128,8 @@ class Get_Data():
         Read Rating Datasets
         """
 
+        print("Reading Rating File......")
+       
         ''' read file'''
         rating_title = ['UserID','MovieID', 'ratings', 'timestamps']
         rating_data_df = pd.read_csv(path, sep='::', header=None, names=rating_title, engine = 'python')
@@ -138,16 +146,77 @@ class Get_Data():
             rating['timestamps'] = time_normlized
         # print(rating_list)
         self.rating_data = rating_list
+        print("Having Read Rating File.")
         return rating_list
 
-    
+    def merge_movies_users_ratings_data(self):
+        pre_movies_data = self.get_movie_message()
+        pre_users_data = self.get_user_message()
+        pre_ratings_data = self.get_rating_message()
+
+        movies_data_to_df = pd.DataFrame.from_records(pre_movies_data)
+        users_data_to_df = pd.DataFrame.from_records(pre_users_data)
+
+        rating_all_message_list = []
+        print("Merging Movies Users Ratings Data")
+        index = 0
+        for rating in pre_ratings_data:
+            UID = rating['UserID']
+            MID = rating['MovieID']
+            RATING = rating['ratings']
+            TIMESTAMPS = rating['timestamps']
+
+
+            user_row = users_data_to_df[users_data_to_df['UserID'].isin([UID])]
+            user_row_list = user_row.to_dict('records')
+            user_row_list_item = user_row_list[0]
+            GENDER = user_row_list_item['Gender']
+            AGE = user_row_list_item['Age']
+            OCCUPTION = user_row_list_item['Occupation']
+
+
+            movie_row = movies_data_to_df[movies_data_to_df['MovieID'].isin([MID])]
+            movie_row_list = movie_row.to_dict('records')
+            movie_row_list_item = movie_row_list[0]
+            TITLE = movie_row_list_item['Title']
+            GENRES = movie_row_list_item['Genres']
+            YEAR = movie_row_list_item['Year']
+            
+            rating_dictionary = {
+                'UserID' : UID, 
+                'Gender' : GENDER, 
+                'Age' : AGE, 
+                'Occupation' : OCCUPTION, 
+                'MovieID' : MID, 
+                'Title' : TITLE, 
+                'Genres' : GENRES, 
+                'Year' : YEAR, 
+                'Timestamps' : TIMESTAMPS, 
+                'Ratings' : RATING
+            }
+            if index % 10000 == 0:
+                print(index)
+            index += 1
+
+            rating_all_message_list.append(rating_dictionary)
+            # print(rating_dictionary)
+        
+        rating_all_message_df = pd.DataFrame.from_records(rating_all_message_list)
+        rating_all_message_df.to_json("merge_movies_users_ratings_data.json")
+        print("Having Merged Movies Users Ratings Data")
+        print(rating_all_message_df)
+            
+        # ratings_data_to_df = pd.DataFrame.from_records(pre_ratings_data)
+        
+        # print(movies_data_to_df, users_data_to_df)
 
 
 if __name__ == "__main__":
     data = Get_Data()
-    data.get_movie_message()
-    print(data.movies_data)
-    data.get_user_message()
-    print(data.users_data)
-    data.get_rating_message()
-    print(data.rating_data)
+    # data.get_movie_message()
+    # print(data.movies_data)
+    # data.get_user_message()
+    # print(data.users_data)
+    # data.get_rating_message()
+    # print(data.rating_data)
+    data.merge_movies_users_ratings_data()
