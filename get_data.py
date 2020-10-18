@@ -229,6 +229,7 @@ class Get_Data():
         '''        
         rating_all_message_df = pd.DataFrame.from_records(rating_all_message_list)
         rating_all_message_df.to_csv("merge_movies_users_ratings_data.csv")
+        rating_all_message_df.to_csv("merge_movies_users_ratings_data.dat")
         print("Having Merged Movies Users Ratings Data")
         print(rating_all_message_df)
             
