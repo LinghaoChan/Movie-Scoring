@@ -202,7 +202,7 @@ class Get_Data():
             TITLE = movie_row_list_item['Title']
             GENRES = movie_row_list_item['Genres']
             YEAR = movie_row_list_item['Year']
-            
+             
             '''
             get a list(dictionary)
             '''
